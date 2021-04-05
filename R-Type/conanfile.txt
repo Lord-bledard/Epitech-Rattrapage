@@ -1,0 +1,9 @@
+[requires]
+boost/1.75.0
+sfml/2.5.1@bincrafters/stable
+
+[options]
+sfml:graphics=True
+
+[generators]
+cmake

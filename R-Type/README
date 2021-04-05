@@ -1,0 +1,7 @@
+HOW TO COMPILE :
+
+add SFML repo for conan :
+conan remote add SFML https://api.bintray.com/conan/bincrafters/public-conan
+set -e
+
+mkdir build && cd build && conan install .. --build=missing && cmake .. -G "Unix Makefiles" && cmake --build .
