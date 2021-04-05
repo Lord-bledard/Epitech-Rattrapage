@@ -37,13 +37,10 @@ void Mainframe::run()
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
             action = RIGHT;
 
-        std::cout << "action : " << action << std::endl;
         window.clear();
 
         for (auto &entity : entities)
         {
-            std::cout << "i am entity " << entity->type << " coords : " << entity->x << " " << entity->y << std::endl;
-
             window.draw(entity->sprite);
         }
 

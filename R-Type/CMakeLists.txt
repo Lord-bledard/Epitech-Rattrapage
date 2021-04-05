@@ -19,12 +19,14 @@ Set(SOURCE_FILES_COMMON
         Common/include/RequestClientAction.h
         Common/include/ClientActionEnum.h
         Common/include/RequestEnum.h
+        Common/include/Monster.h
 
         Common/src/Request.cpp
         Common/src/RequestNewGame.cpp
         Common/src/GameEntity.cpp
         Common/src/Wall.cpp
         Common/src/Ship.cpp
+        Common/src/Monster.cpp
         Common/src/RequestGameState.cpp
         )
 
@@ -46,10 +48,7 @@ set(SOURCE_FILES_CLIENT
         Client/src/main.cpp
         Client/src/Client.cpp
         Client/src/Menu.cpp
-        Client/src/Mainframe.cpp
-
-
-        )
+        Client/src/Mainframe.cpp)
 
 add_executable(r-type_server ${SOURCE_FILES_SERVER} ${SOURCE_FILES_COMMON})
 add_executable(r-type_client ${SOURCE_FILES_CLIENT} ${SOURCE_FILES_COMMON})

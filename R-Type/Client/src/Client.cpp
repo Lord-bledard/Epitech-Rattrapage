@@ -11,6 +11,7 @@
 #include <RequestGameState.h>
 #include <Ship.h>
 #include <Wall.h>
+#include <Monster.h>
 #include "ResponseListGames.h"
 
 using boost::asio::ip::udp;
@@ -62,7 +63,6 @@ std::vector<GameEntity*> Client::get_state(ClientActionEnum action)
         RequestGameState state;
         this->socket->receive_from(boost::asio::buffer((char *) &state, sizeof(RequestGameState)), server_endpoint);
 
-        std::cout << "nb items " << state.nbItems << std::endl;
 
         for (int i = 0; i < state.nbItems; i++)
         {
@@ -80,6 +80,12 @@ std::vector<GameEntity*> Client::get_state(ClientActionEnum action)
 
                 case WALL: {
                     Wall* entity = new Wall();
+                    entity->setPosition(item.x, item.y);
+                    entities.push_back(entity);
+                    break;
+                }
+                case MONSTER: {
+                    Monster* entity = new Monster();
                     entity->setPosition(item.x, item.y);
                     entities.push_back(entity);
                     break;

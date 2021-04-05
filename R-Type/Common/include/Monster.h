@@ -4,17 +4,18 @@
 #include <boost/asio.hpp>
 #include <ResponseListGames.h>
 #include "Request.h"
+#include "GameEntity.h"
 
 using boost::asio::ip::udp;
 
-class Monster {
-private:
+class Monster : public GameEntity {
 
+bool dir;
 public:
 	Monster();
-	int _id;
-	
-    
+	bool goingUp();
+	bool goingDown();
+	void changeDirection();
 };
 
 #endif                 /* !R_TYPE_MONSTER_H */

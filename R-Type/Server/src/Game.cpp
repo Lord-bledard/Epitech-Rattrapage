@@ -1,4 +1,5 @@
 #include <iostream>
+#include <Monster.h>
 #include "Ship.h"
 #include "Wall.h"
 
@@ -24,6 +25,13 @@ Game::Game()
     Wall* wall10 = new Wall();
     Wall* wall11 = new Wall();
     Wall* wall12 = new Wall();
+
+    Monster* monster = new Monster();
+    monster->setPosition(400, 150);
+
+    Monster* monster2 = new Monster();
+    monster2->setPosition(550, 150);
+    monster2->changeDirection();
 
     wall1->setPosition(0 + 0 * wall1->width, 0);
     wall2->setPosition(0 + 1 * wall1->width, 0);
@@ -52,15 +60,12 @@ Game::Game()
     this->entities.push_back(wall10);
     this->entities.push_back(wall11);
     this->entities.push_back(wall12);
+    this->entities.push_back(monster);
+    this->entities.push_back(monster2);
 
     for (int i = 0; i < this->entities.size(); i++)
     {
         GameEntity* entity = this->entities[i];
-
-        std::cout << "type : " << entity->type;
-        std::cout << " x : " << entity->x;
-        std::cout << " y : " << entity->y;
-        std::cout << std::endl;
     }
 
 

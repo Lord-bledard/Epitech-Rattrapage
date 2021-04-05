@@ -13,7 +13,6 @@ class Ship : public GameEntity {
 
 public:
 	Ship();
-	int _id;
     
 };
 

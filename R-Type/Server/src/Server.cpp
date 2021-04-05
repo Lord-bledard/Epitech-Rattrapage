@@ -4,6 +4,7 @@
 #include "Server.h"
 #include <boost/bind.hpp>
 #include <Ship.h>
+#include <Monster.h>
 #include "RequestClientAction.h"
 #include "RequestGameState.h"
 #include "ResponseListGames.h"
@@ -85,6 +86,29 @@ void Server::receive_client_action()
             ship->setPosition(x + speed, y);
             break;
     }
+
+    for (int i = 0; i < this->gameEngine.entities.size(); i++)
+    {
+        GameEntity* entity = this->gameEngine.entities[i];
+
+        if (entity->type == EntityEnum::MONSTER)
+        {
+            Monster* monster = (Monster*) entity;
+
+            int x = monster->x;
+            int y = monster->y;
+
+            if (monster->goingUp())
+                monster->setPosition(x, y - 3);
+            if (monster->goingDown())
+                monster->setPosition(x, y + 3);
+
+            if (monster->y < 30 || monster->y > 300)
+                monster->changeDirection();
+        }
+    }
+
+
 }
 
 void Server::send_game_state()
