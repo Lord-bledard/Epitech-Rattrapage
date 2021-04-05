@@ -29,7 +29,6 @@ Bullet::Bullet(sf::Vector2f position, int id, float range, int dir = 1) {
     };
 
     Bullet::~Bullet(){};
-
    // int Bullet::event(sf::Event event , sf::RenderWindow *window) {return;}
     bool Bullet::display(sf::RenderWindow *window, float deltatime) {
         _rect.move(1 * this->dir, 0);

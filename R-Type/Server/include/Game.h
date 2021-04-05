@@ -2,16 +2,13 @@
 #define R_TYPE_GAME_H
 
 #include <string>
+#include <GameEntity.h>
 
 class Game {
-
 public:
-    int nbPlayers;
-    int capacity;
-    std::string name;
+    std::vector<GameEntity*> entities;
 
-    Game(int capacity, std::string name);
-    void start();
+    Game();
 };
 
 #endif //R_TYPE_GAME_H

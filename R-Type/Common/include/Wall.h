@@ -5,6 +5,7 @@
 
 class Wall : public GameEntity
 {
+
 public:
     Wall();
 };

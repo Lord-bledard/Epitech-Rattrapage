@@ -4,6 +4,8 @@
 #include <boost/asio.hpp>
 #include <ResponseListGames.h>
 #include "Request.h"
+#include <ClientActionEnum.h>
+#include "RequestGameState.h"
 
 using boost::asio::ip::udp;
 
@@ -14,18 +16,16 @@ private:
     udp::socket *socket;
     udp::endpoint *endpoint;
 
-    void create_game_menu();
     void join_game_menu();
     void send_request(Request* request);
 
-    std::vector<GameListItem> get_game_list();
-    ResponseListGames receive_response_list_games();
 public:
 	Client();
 
     void init();
 	void run();
-
+    std::vector<GameEntity*> get_state(ClientActionEnum action);
+	void receive_game_state();
 
 
 };

@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include "EntityEnum.h"
 
 class GameEntity
 {
@@ -12,6 +13,11 @@ public:
 
     int width;
     int height;
+
+    int x;
+    int y;
+
+    EntityEnum type;
 
     GameEntity(std::string filename, sf::IntRect rect, int width, int height);
     void setPosition(int x, int y);

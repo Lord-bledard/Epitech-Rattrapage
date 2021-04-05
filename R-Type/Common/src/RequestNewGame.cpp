@@ -1,4 +1,5 @@
 #include "RequestNewGame.h"
+#include <cstring>
 
 RequestNewGame::RequestNewGame() : Request(), nbPlayers(0)
 {}

@@ -2,148 +2,107 @@
 
 #include <iostream>
 #include "Server.h"
-#include "GameManager.h"
 #include <boost/bind.hpp>
+#include <Ship.h>
+#include "RequestClientAction.h"
+#include "RequestGameState.h"
 #include "ResponseListGames.h"
+#include "Game.h"
 
 using boost::asio::ip::udp;
 
-
 Server::Server()
 {
-    this->gameManager = GameManager();
     std::cout << "create server" << std::endl;
+    gameEngine = Game();
 }
 
 void Server::run()
 {
 
-    this->gameManager.start_new_game(3, "DefaultGame");
 
-    this->receive();
-    this->io_service->run();
-
-    std::cout << "shutting down..." << std::endl;
+    while (true)
+    {
+        this->receive_client_action();
+        this->send_game_state();
+    }
 }
+
 
 void Server::init(int port)
 {
-    this->io_service = new boost::asio::io_service();
 
-    endpoint = new udp::endpoint(udp::v4(), port);
-    this->socket = new udp::socket (*io_service, *endpoint);
+    this->io_service = new boost::asio::io_context();
+    this->socket = new udp::socket (*io_service, udp::endpoint(udp::v4(), 9999));
+
+    this->endpoint = new udp::endpoint();
 
 }
 
-void Server::handle_request_init_game(RequestNewGame* request)
+void Server::receive_client_action()
 {
-    this->gameManager.start_new_game(request->nbPlayers, request->gameName);
-}
+    RequestClientAction request;
+    this->socket->receive_from(boost::asio::buffer(&request, sizeof(RequestClientAction)), *endpoint);
 
-void Server::handle_request(Request* request)
-{
-    switch (request->type)
+    int speed = 2;
+    switch (request.action)
     {
-        case RequestType::INIT_GAME:
-        {
-            this->handle_request_init_game((RequestNewGame *) request);
+        case ClientActionEnum::IDLE:
+            std::cout << "IDLE" << std::endl;
+            break;
+        case ClientActionEnum::UP: {
+            std::cout << "UP" << std::endl;
+            Ship *ship = (Ship *) this->gameEngine.entities[0];
+            int x = ship->x;
+            int y = ship->y;
+            ship->setPosition(x, y - speed);
             break;
         }
-        case RequestType::LIST_GAMES:
-        {
-            this->handle_request_list_games();
+        case ClientActionEnum::DOWN: {
+            std::cout << "DOWN" << std::endl;
+
+            Ship *ship = (Ship *) this->gameEngine.entities[0];
+            int x = ship->x;
+            int y = ship->y;
+            ship->setPosition(x, y + speed);
             break;
         }
-        default:
-            break;
+        case ClientActionEnum::LEFT: {
+            std::cout << "LEFT" << std::endl;
 
-    }
-}
-
-void Server::handle_receive(const boost::system::error_code& error, size_t bytes_transferred)
-{
-    std::cout << "Receive" << std::endl;
-
-    if (error == boost::asio::error::operation_aborted)
-    {
-        std::cout << "Receive but error : " << error << std::endl;
-        return;
-    }
-
-    /* Check data size available on socket */
-    unsigned int available = this->socket->available();
-    std::cout << "available : " << available << std::endl;
-
-    /* Prepare buffer and fill it */
-    unsigned char* buffer = new unsigned char[available];
-    boost::system::error_code ec;
-    unsigned int packetSize = this->socket->receive_from(boost::asio::buffer(buffer, available), *endpoint, 0, ec);
-    std::cout << "packetsize : " << packetSize << std::endl;
-
-    /* error checking */
-    if (ec)
-        std::cout << "error : " << ec << std::endl;
-
-
-    Request *req = (Request*) buffer;
-    std::cout << "request type : " << req->type << std::endl;
-
-    this->handle_request((Request*) buffer);
-
-    /* switch to receive mode again */
-    this->receive();
-}
-
-
-void Server::receive()
-{
-    std::cout << "waiting for receive..." << std::endl;
-
-    /* call 'RequestManager::handle_receive' when request is received */
-    socket->async_receive(boost::asio::null_buffers(),
-                          boost::bind(&Server::handle_receive, this,
-                                      boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
-}
-
-void Server::send_request(Request* request)
-{
-    size_t s;
-
-    switch (request->type)
-    {
-        case RequestType::RESPONSE_LIST_GAME: {
-            s = sizeof(ResponseListGames);
-
-            ResponseListGames* test = (ResponseListGames*) request;
-            std::cout << test->gameList[0].gameName << std::endl;
-            std::cout << test->gameList[1].gameName << std::endl;
-            std::cout << s << std::endl;
+            Ship *ship = (Ship *) this->gameEngine.entities[0];
+            int x = ship->x;
+            int y = ship->y;
+            ship->setPosition(x - speed, y);
             break;
         }
-        default:
+        case ClientActionEnum::RIGHT:
+            std::cout << "RIGHT" << std::endl;
+
+            Ship *ship = (Ship *) this->gameEngine.entities[0];
+            int x = ship->x;
+            int y = ship->y;
+            ship->setPosition(x + speed, y);
             break;
     }
-
-    std::cout << "send request of type " << request->type << std::endl;
-
-    socket->send_to(boost::asio::buffer((char *) request, s), *endpoint);
 }
 
-
-void Server::handle_request_list_games()
+void Server::send_game_state()
 {
-    ResponseListGames responseGameList = ResponseListGames();
 
-    std::vector<GameListItem> gameList = this->gameManager.get_game_list();
+    RequestGameState request;
 
-    responseGameList.nbGames = gameList.size();
-
-    for (int i = 0; i < gameList.size(); i++)
+    for (int i = 0; i < this->gameEngine.entities.size(); i++)
     {
-        responseGameList.gameList[i] = gameList[i];
+        GameEntity* entity = this->gameEngine.entities[i];
+        request.gameItems[i] = {.entity = entity->type, .x = entity->x, .y = entity->y};
+        std::cout << "type : " << entity->type;
+        std::cout << " x : " << entity->x;
+        std::cout << " y : " << entity->y;
+        std::cout << std::endl;
     }
 
-    this->send_request(&responseGameList);
+    request.nbItems = this->gameEngine.entities.size();
+    this-socket->send_to(boost::asio::buffer(&request, sizeof(RequestGameState)), *endpoint);
 }
-
 

@@ -2,15 +2,7 @@
 #define R_TYPE_REQUEST_H
 
 #include <string>
-
-enum RequestType {
-    UNKNOWN,
-    INIT_GAME,
-    END_GAME,
-    LIST_GAMES,
-    RESPONSE_LIST_GAME, /* todo maybe split request and response enums ? */
-    STOP
-};
+#include "RequestEnum.h"
 
 struct Request {
 
